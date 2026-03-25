@@ -309,6 +309,7 @@ print('   db_pat = dbutils.secrets.get(scope="github-secrets", key="databricks-p
 
 # DBTITLE 1,Export Notebook & Push to GitHub dab-demo1
 import subprocess, shutil, base64, os
+from datetime import datetime
 
 # --- Configuration ---
 repo_name = "dab-demo1"
@@ -370,25 +371,39 @@ try:
         f.write(notebook_content)
     print(f"   ✅ Wrote {nb_filename} ({len(notebook_content)} bytes)")
     
-    # Stage, commit, push
+    # Stage, commit, push with versioned commit message
     run_git(["git", "add", "."])
     
-    commit_msg = "Add Databricks PAT & GitHub Integration lab notebook"
+    version_ts = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
+    commit_msg = f"Update lab notebook — v{version_ts}"
     commit_result = run_git(["git", "commit", "-m", commit_msg])
     
     if commit_result.returncode == 0:
         push_result = run_git(["git", "push", "origin", branch])
         if push_result.returncode == 0:
-            print(f"\n🎉 SUCCESS! Notebook pushed to GitHub!")
-            print(f"   📂 Repo : https://github.com/{github_username}/{repo_name}")
-            print(f"   📄 File : {nb_filename}")
-            print(f"   🌿 Branch: {branch}")
+            # Fetch commit SHA for version tracking
+            sha_result = run_git(["git", "rev-parse", "--short", "HEAD"])
+            short_sha = sha_result.stdout.strip() if sha_result.returncode == 0 else "N/A"
+            
+            print(f"\n🎉 SUCCESS! Updated notebook pushed to GitHub!")
+            print(f"   📂 Repo   : https://github.com/{github_username}/{repo_name}")
+            print(f"   📄 File   : {nb_filename}")
+            print(f"   🌿 Branch : {branch}")
+            print(f"   🔖 Commit : {short_sha}")
+            print(f"   🕐 Version: {version_ts}")
         else:
             print(f"\n❌ Push failed: {push_result.stderr}")
     elif "nothing to commit" in commit_result.stdout:
-        print("\n✅ Nothing new to commit — repo is already up to date.")
+        print("\n✅ Nothing new to commit — repo is already up to date with this version.")
     else:
         print(f"\n❌ Commit failed: {commit_result.stderr}")
+
+    # Show git log for version history
+    print(f"\n📜 Version History (last 5 commits):")
+    log_result = run_git(["git", "log", "--oneline", "-5"])
+    if log_result.returncode == 0:
+        for line in log_result.stdout.strip().split("\n"):
+            print(f"   {line}")
 
 except Exception as e:
     print(f"\n❌ Git operation failed: {e}")
