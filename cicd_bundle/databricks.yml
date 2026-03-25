@@ -1,0 +1,22 @@
+# ==========================================================
+# CI/CD Production Bundle — v1: Dev-Only Configuration
+# ==========================================================
+bundle:
+  name: cicd_production_bundle
+
+resources:
+  jobs:
+    daily_etl:
+      name: "Daily ETL Pipeline"
+      schedule:
+        quartz_cron_expression: "0 0 6 * * ?"
+        timezone_id: UTC
+      tasks:
+        - task_key: run_etl
+          notebook_task:
+            notebook_path: ./src/etl.py
+
+targets:
+  dev:
+    mode: development
+    default: true
