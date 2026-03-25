@@ -1,29 +1,16 @@
 # ==========================================================
-# CI/CD Production Bundle — v3: Full Production-Ready
+# CI/CD Production Bundle — v1: Dev-Only Configuration
 # ==========================================================
 bundle:
   name: cicd_production_bundle
 
-variables:
-  catalog:
-    description: "Target catalog"
-    default: workspace
-  alert_email:
-    description: "Alert email for failures"
-    default: team@example.com
-
 resources:
   jobs:
     daily_etl:
-      name: "[${bundle.target}] Daily ETL Pipeline"
+      name: "Daily ETL Pipeline"
       schedule:
         quartz_cron_expression: "0 0 6 * * ?"
         timezone_id: UTC
-      email_notifications:
-        on_failure:
-          - ${var.alert_email}
-      queue:
-        enabled: true
       tasks:
         - task_key: run_etl
           notebook_task:
@@ -33,28 +20,3 @@ targets:
   dev:
     mode: development
     default: true
-    variables:
-      alert_email: dev-null@example.com
-
-  staging:
-    variables:
-      catalog: workspace
-      alert_email: staging-alerts@example.com
-    permissions:
-      - level: CAN_VIEW
-        group_name: data-engineers
-      - level: CAN_MANAGE
-        group_name: platform-team
-
-  prod:
-    mode: production
-    variables:
-      catalog: workspace
-      alert_email: prod-oncall@example.com
-    permissions:
-      - level: CAN_VIEW
-        group_name: data-engineers
-      - level: CAN_MANAGE_RUN
-        group_name: data-ops
-      - level: CAN_MANAGE
-        group_name: platform-admins
