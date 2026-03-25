@@ -1,5 +1,5 @@
 # ==========================================================
-# CI/CD Production Bundle — v2: Staging + Permissions
+# CI/CD Production Bundle — v3: Full Production-Ready
 # ==========================================================
 bundle:
   name: cicd_production_bundle
@@ -45,3 +45,16 @@ targets:
         group_name: data-engineers
       - level: CAN_MANAGE
         group_name: platform-team
+
+  prod:
+    mode: production
+    variables:
+      catalog: workspace
+      alert_email: prod-oncall@example.com
+    permissions:
+      - level: CAN_VIEW
+        group_name: data-engineers
+      - level: CAN_MANAGE_RUN
+        group_name: data-ops
+      - level: CAN_MANAGE
+        group_name: platform-admins
