@@ -1,0 +1,20 @@
+# ==========================================================
+# Monitoring Configuration — Auto-updated by Lab 7 Dashboard
+# Last refreshed: 2026-03-25 12:08:12 UTC
+# ==========================================================
+
+monitoring:
+  dashboard_refresh_interval: 5m
+  alert_channels:
+    - email: yogiman17@gmail.com
+    - slack: "#data-alerts"
+  
+  metrics:
+    git_commits_tracked: true
+    etl_job_runs_tracked: true
+    dlt_pipeline_tracked: true
+  
+  thresholds:
+    max_job_duration_sec: 300
+    min_success_rate_pct: 95
+    max_pipeline_failures: 2
